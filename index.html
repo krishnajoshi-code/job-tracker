@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Krishna · Job Tracker</title>
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --ink:#1a1f28; --ink-2:#5a6472; --ink-3:#8b94a1;
+    --line:#e3e7ec; --accent:#2458c5; --accent-ink:#ffffff;
+    --good-bg:#e4f3e6; --good-ink:#1d6b2a; --warn-bg:#fdf2d7; --warn-ink:#7a5a08;
+    --serious-bg:#fde3d7; --serious-ink:#93400f; --crit-bg:#fadade; --crit-ink:#a01f30;
+    --neutral-bg:#eceff3; --neutral-ink:#48505c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#12151a; --surface:#1b2028; --ink:#e8ebef; --ink-2:#9aa4b1; --ink-3:#6b7480;
+      --line:#2a313b; --accent:#6d9bff; --accent-ink:#0e1116;
+      --good-bg:#1c3320; --good-ink:#7fd48c; --warn-bg:#3a3114; --warn-ink:#e6c25f;
+      --serious-bg:#3d2415; --serious-ink:#f0a06a; --crit-bg:#3d1a20; --crit-ink:#f28b98;
+      --neutral-bg:#262c35; --neutral-ink:#aeb7c2;
+    }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.45 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         background:var(--bg); color:var(--ink); }
+  header { padding:18px 22px 6px; display:flex; flex-wrap:wrap; gap:10px; align-items:baseline; }
+  header h1 { font-size:19px; margin:0; }
+  header .meta { color:var(--ink-3); font-size:12.5px; }
+  header .spacer { flex:1; }
+  button.ghost { background:none; border:1px solid var(--line); color:var(--ink-2);
+                 border-radius:7px; padding:5px 11px; font-size:12.5px; cursor:pointer; }
+  .wrap { padding:0 22px 40px; max-width:1280px; margin:0 auto; }
+  #lock { max-width:380px; margin:14vh auto; background:var(--surface); border:1px solid var(--line);
+          border-radius:14px; padding:28px; }
+  #lock h2 { margin:0 0 6px; font-size:17px; }
+  #lock p { color:var(--ink-2); font-size:13.5px; margin:0 0 16px; }
+  #pass { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px;
+          background:var(--bg); color:var(--ink); font-size:15px; }
+  #unlock { margin-top:12px; width:100%; padding:10px; border:0; border-radius:8px;
+            background:var(--accent); color:var(--accent-ink); font-weight:600; cursor:pointer; }
+  #err { color:var(--crit-ink); font-size:13px; min-height:18px; margin-top:8px; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit, minmax(148px, 1fr)); gap:10px; margin:14px 0 18px; }
+  .tile { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:13px 15px; }
+  .tile .n { font-size:26px; font-weight:700; letter-spacing:-.5px; }
+  .tile .l { color:var(--ink-2); font-size:12px; margin-top:2px; }
+  .tile.goal { border-color:var(--accent); }
+  nav { display:flex; gap:4px; flex-wrap:wrap; border-bottom:1px solid var(--line); margin-bottom:12px; }
+  nav button { background:none; border:0; border-bottom:2px solid transparent; padding:9px 13px;
+               font-size:13.5px; color:var(--ink-2); cursor:pointer; }
+  nav button.on { color:var(--ink); border-bottom-color:var(--accent); font-weight:600; }
+  .pane { overflow-x:auto; background:var(--surface); border:1px solid var(--line); border-radius:12px; }
+  table { border-collapse:collapse; width:100%; font-size:13px; }
+  th { text-align:left; color:var(--ink-3); font-weight:600; font-size:11.5px; text-transform:uppercase;
+       letter-spacing:.4px; padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  td { padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top; max-width:420px; }
+  tr:last-child td { border-bottom:0; }
+  td a { color:var(--accent); text-decoration:none; word-break:break-all; }
+  td a:hover { text-decoration:underline; }
+  .pill { display:inline-block; padding:2px 9px; border-radius:999px; font-size:11.5px; font-weight:600; white-space:nowrap; }
+  .searchrow { margin:0 0 10px; }
+  #q { padding:8px 12px; width:min(340px, 100%); border:1px solid var(--line); border-radius:8px;
+       background:var(--surface); color:var(--ink); font-size:13.5px; }
+  .empty { padding:26px; color:var(--ink-3); text-align:center; }
+  footer { color:var(--ink-3); font-size:11.5px; padding:16px 0 0; }
+</style>
+</head>
+<body>
+<div id="lock">
+  <h2>Krishna's job tracker</h2>
+  <p>This page is public but the data is encrypted. Enter the passphrase from
+     <code>.tracker-passphrase</code> (in the automation folder) to decrypt locally.</p>
+  <input id="pass" type="password" placeholder="Passphrase" autocomplete="current-password">
+  <button id="unlock">Unlock</button>
+  <div id="err"></div>
+</div>
+
+<div id="app" style="display:none">
+  <header>
+    <h1>Krishna's Job Hunt</h1>
+    <span class="meta" id="generated"></span>
+    <span class="spacer"></span>
+    <button class="ghost" id="refresh">Refresh</button>
+    <button class="ghost" id="lockbtn">Lock</button>
+  </header>
+  <div class="wrap">
+    <div class="kpis" id="kpis"></div>
+    <div class="searchrow"><input id="q" placeholder="Filter rows (company, status, text...)"></div>
+    <nav id="tabs"></nav>
+    <div class="pane"><div id="pane"></div></div>
+    <footer>Data updates automatically after every run · encrypted at rest on GitHub Pages · decrypted only in your browser.</footer>
+  </div>
+</div>
+
+<script>
+// All dynamic content is rendered via DOM methods (createElement/textContent) - no
+// innerHTML with data - so tracker text can never execute as markup.
+const $ = s => document.querySelector(s);
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+let DOC = null, TAB = "Applications", QUERY = "";
+
+const el = (tag, cls, text) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+};
+
+const statusKind = s => {
+  s = (s || "").toUpperCase();
+  if (s.startsWith("INTERVIEW") || s.startsWith("OFFER") || s === "DONE" || s.startsWith("PAID")) return ["good", "✓"];
+  if (s.startsWith("REPLY") || s.startsWith("SCREEN")) return ["good", "✓"];
+  if (s.startsWith("APPLIED") || s.startsWith("SENT") || s.startsWith("ACTIVE")) return ["neutral", "→"];
+  if (s.startsWith("PENDING") || s.startsWith("WATCH") || s.startsWith("QUEUED") || s.startsWith("READY") || s.startsWith("OPTIONAL")) return ["warn", "…"];
+  if (s.startsWith("BLOCKED") || s.startsWith("BOUNCED") || s.startsWith("OVERDUE")) return ["serious", "!"];
+  if (s.startsWith("REJECTED") || s.startsWith("GHOSTED")) return ["crit", "✕"];
+  return ["neutral", ""];
+};
+
+function cellNode(value, isStatus) {
+  const v = String(value ?? "");
+  const td = el("td");
+  if (!v) return td;
+  if (isStatus) {
+    const [kind, icon] = statusKind(v);
+    const p = el("span", "pill", (icon ? icon + " " : "") + v);
+    p.style.background = `var(--${kind}-bg)`;
+    p.style.color = `var(--${kind}-ink)`;
+    td.appendChild(p);
+    return td;
+  }
+  const hyper = v.match(/^=HYPERLINK\("([^"]+)"(?:,"([^"]*)")?\)$/);
+  if (hyper) {
+    const a = el("a", null, hyper[2] || "link");
+    a.href = hyper[1]; a.target = "_blank"; a.rel = "noopener";
+    td.appendChild(a);
+    return td;
+  }
+  if (/^https?:\/\//.test(v)) {
+    const a = el("a", null, v.replace(/^https?:\/\/(www\.)?/, "").slice(0, 60));
+    a.href = v; a.target = "_blank"; a.rel = "noopener";
+    td.appendChild(a);
+    return td;
+  }
+  td.textContent = v;
+  return td;
+}
+
+const SHEETS = {
+  Applications: { key:"applications", cols:["#","Date","Company","Role","Job URL","Salary","Remote","Score","Status","Applied at","CV md","CV pdf","Letter","Proof","Recruiter","Team","Follow-up","Last activity","Notes"], status:8 },
+  Actions:      { key:"actions", cols:["#","Raised","Action for Krishna","Link","Blocks","Status","Done"], status:5 },
+  Outreach:     { key:"outreach", cols:["Date","Agency","Channel","To","Subject","Status","Follow-up"], status:5 },
+  LinkedIn:     { key:"linkedin", cols:["Date","Person","Title","Company","App #","Note","Status"], status:6 },
+  Inbound:      { key:"inbound", cols:["Date","Channel","Who","Company","Summary","Action taken","Status"], status:6 },
+  Freelance:    { key:"freelance", cols:["Date","Platform","Type","Item","Amount","Status","Link"], status:5 },
+  Income:       { key:"income", cols:["Date","Source","Client","Description","Invoiced £","Fees £","Received £","Received on","Status","Notes"], status:8 },
+};
+
+function renderKpis() {
+  const box = $("#kpis");
+  box.replaceChildren();
+  const k = DOC.kpis, g = DOC.goal;
+  const tile = (n, label, goal) => {
+    const t = el("div", "tile" + (goal ? " goal" : ""));
+    t.appendChild(el("div", "n", String(n)));
+    t.appendChild(el("div", "l", label));
+    box.appendChild(t);
+  };
+  tile(k.interviews, "🎯 interviews booked", true);
+  tile(g.daysLeft >= 0 ? g.daysLeft + "d" : "past", "to first-interview deadline (" + g.deadline + ")", true);
+  tile(k.submitted, "applications submitted");
+  tile(k.livePipeline, "live in pipeline");
+  tile(k.actionsPending, "⚠ actions waiting on Krishna");
+  tile(k.connects, "LinkedIn connects");
+  tile(k.agencyEmails, "agency intros");
+  tile("£" + Number(k.receivedNet || 0).toLocaleString("en-GB"), "freelance received (net)");
+}
+
+function renderTabs() {
+  const nav = $("#tabs");
+  nav.replaceChildren();
+  Object.keys(SHEETS).forEach(name => {
+    const b = el("button", name === TAB ? "on" : "", name);
+    b.onclick = () => { TAB = name; renderTabs(); renderPane(); };
+    nav.appendChild(b);
+  });
+}
+
+function renderPane() {
+  const spec = SHEETS[TAB];
+  const pane = $("#pane");
+  pane.replaceChildren();
+  let rows = DOC[spec.key] || [];
+  if (QUERY) rows = rows.filter(r => r.join(" ").toLowerCase().includes(QUERY));
+  if (!rows.length) {
+    pane.appendChild(el("div", "empty", QUERY ? "Nothing matches that filter." : "Nothing here yet."));
+    return;
+  }
+  const table = el("table"), thead = el("thead"), hr = el("tr");
+  spec.cols.forEach(c => hr.appendChild(el("th", null, c)));
+  thead.appendChild(hr); table.appendChild(thead);
+  const tbody = el("tbody");
+  rows.forEach(r => {
+    const tr = el("tr");
+    spec.cols.forEach((_, i) => tr.appendChild(cellNode(r[i], i === spec.status)));
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  pane.appendChild(table);
+}
+
+function renderAll() {
+  $("#generated").textContent = "updated " + DOC.generated;
+  renderKpis(); renderTabs(); renderPane();
+}
+
+async function decrypt(payload, pass) {
+  const km = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey(
+    { name:"PBKDF2", salt:b64(payload.salt), iterations:payload.iters, hash:"SHA-256" },
+    km, { name:"AES-GCM", length:256 }, false, ["decrypt"]);
+  const pt = await crypto.subtle.decrypt({ name:"AES-GCM", iv:b64(payload.iv) }, key, b64(payload.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+
+async function load(pass) {
+  const res = await fetch("data.enc.json?ts=" + Date.now(), { cache:"no-store" });
+  if (!res.ok) throw new Error("data.enc.json not found (has a run published yet?)");
+  DOC = await decrypt(await res.json(), pass);
+  localStorage.setItem("kt-pass", pass);
+  $("#lock").style.display = "none";
+  $("#app").style.display = "block";
+  renderAll();
+}
+
+$("#unlock").onclick = () => load($("#pass").value).catch(e => {
+  $("#err").textContent = e.name === "OperationError" ? "Wrong passphrase." : e.message;
+});
+$("#pass").addEventListener("keydown", e => { if (e.key === "Enter") $("#unlock").click(); });
+$("#refresh").onclick = () => load(localStorage.getItem("kt-pass"));
+$("#lockbtn").onclick = () => { localStorage.removeItem("kt-pass"); location.reload(); };
+$("#q").addEventListener("input", e => { QUERY = e.target.value.toLowerCase(); renderPane(); });
+setInterval(() => { if (DOC && localStorage.getItem("kt-pass")) $("#refresh").click(); }, 300000);
+const saved = localStorage.getItem("kt-pass");
+if (saved) load(saved).catch(() => localStorage.removeItem("kt-pass"));
+</script>
+</body>
+</html>
