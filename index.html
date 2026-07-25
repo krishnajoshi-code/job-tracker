@@ -38,6 +38,13 @@
   }
   .serif { font-family:"Fraunces", Georgia, serif; }
   a { color:inherit; }
+  body.snap *, body.snap *::before, body.snap *::after { animation:none !important; transition:none !important; }
+  body.snap .rise { opacity:1 !important; transform:none !important; }
+  body.snap #record { display:none; }   /* phone screenshots stop at the story; the table lives on the live page */
+  @media (prefers-reduced-motion: reduce) {
+    * { animation:none !important; transition:none !important; }
+    .rise { opacity:1; transform:none; }
+  }
 
   /* ---------- lock ---------- */
   #lock { min-height:100vh; display:grid; place-items:center; padding:24px; }
@@ -71,7 +78,7 @@
           border-bottom:1px solid var(--line-2); align-items:end; }
   @media (max-width:760px) { .hero { grid-template-columns:1fr; gap:22px; } }
   .hero .goalline { font-family:var(--mono); font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-2); margin-bottom:10px; }
-  .hero .big { font-family:"Fraunces",Georgia,serif; font-weight:340; font-size:clamp(44px,7vw,76px);
+  .hero .big { font-family:"Fraunces",Georgia,serif; font-weight:340; font-size:clamp(40px,7vw,76px);
                line-height:1.02; letter-spacing:-.02em; margin:0; }
   .hero .big b { font-weight:640; color:var(--signal); font-style:normal; }
   .hero .sub { color:var(--ink-2); margin-top:14px; font-size:14px; max-width:46ch; }
@@ -85,6 +92,7 @@
   .herostats > div { background:var(--card); padding:16px 16px 14px; }
   .herostats .n { font-family:"Fraunces",Georgia,serif; font-weight:540; font-size:30px; line-height:1;
                   font-variant-numeric:tabular-nums; }
+  .herostats .n small { font-family:var(--mono); font-size:11px; color:var(--ink-3); font-weight:400; margin-left:4px; }
   .herostats .l { font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
                   color:var(--ink-3); margin-top:7px; }
 
@@ -95,6 +103,57 @@
                  color:var(--ink-2); margin:0; font-weight:500; }
   .seclabel .rule { flex:1; height:1px; background:var(--line-2); }
   .seclabel .count { font-family:var(--mono); font-size:11.5px; color:var(--signal); }
+  .seclabel .hint { font-family:var(--mono); font-size:10px; letter-spacing:.06em; color:var(--ink-3); }
+
+  /* ---------- funnel ---------- */
+  .funnel { display:flex; flex-direction:column; gap:2px; }
+  .fstage { display:grid; grid-template-columns:118px 1fr 74px; gap:12px; align-items:center;
+            background:none; border:0; padding:6px 2px; text-align:left; cursor:pointer; border-radius:3px;
+            font:inherit; color:inherit; width:100%; }
+  .fstage:hover, .fstage:focus-visible { background:color-mix(in srgb, var(--signal) 5%, transparent); outline:none; }
+  .fstage.on { background:color-mix(in srgb, var(--signal) 9%, transparent); }
+  .fstage .fl { font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-2); }
+  .fstage .ftrack { height:22px; position:relative; }
+  .fstage .fbar { position:absolute; inset:0 auto 0 0; background:var(--signal); border-radius:0 4px 4px 0; min-width:3px; }
+  .fstage .fbar.zero { background:var(--line-2); width:3px; }
+  .fstage .fn { font-family:var(--mono); font-size:12px; text-align:right; font-variant-numeric:tabular-nums; }
+  .fstage .fn .pct { display:block; font-size:10px; color:var(--ink-3); }
+  .fnote { font-family:var(--mono); font-size:10.5px; color:var(--ink-3); margin-top:10px; letter-spacing:.04em; }
+
+  /* ---------- cadence chart ---------- */
+  .cadwrap { overflow-x:auto; }
+  .cadence { display:flex; align-items:flex-end; gap:2px; height:120px; min-width:340px; padding-bottom:4px;
+             border-bottom:1px solid var(--line-2); }
+  .cday { flex:1 0 8px; display:flex; flex-direction:column; justify-content:flex-end; height:100%;
+          background:none; border:0; padding:0; cursor:default; border-radius:2px 2px 0 0; }
+  .cday .cbar { background:var(--signal); border-radius:2px 2px 0 0; min-height:2px; }
+  .cday.zero .cbar { background:var(--line-2); height:2px; }
+  .cday:hover .cbar, .cday:focus-visible .cbar { filter:brightness(1.15); }
+  .cday:focus-visible { outline:2px solid var(--signal); outline-offset:2px; }
+  .cadaxis { display:flex; gap:2px; min-width:340px; margin-top:5px; }
+  .cadaxis span { flex:1 0 8px; font-family:var(--mono); font-size:9px; color:var(--ink-3); text-align:center;
+                  overflow:visible; white-space:nowrap; }
+  .cadsum { display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; font-family:var(--mono); font-size:11px; color:var(--ink-2); }
+  .cadsum b { color:var(--ink); font-weight:500; }
+
+  /* ---------- status breakdown ---------- */
+  .statusrows { display:flex; flex-direction:column; gap:2px; }
+  .srow { display:grid; grid-template-columns:118px 1fr 46px; gap:12px; align-items:center; background:none;
+          border:0; padding:5px 2px; cursor:pointer; font:inherit; color:inherit; text-align:left; border-radius:3px; width:100%; }
+  .srow:hover, .srow:focus-visible { background:color-mix(in srgb, var(--signal) 5%, transparent); outline:none; }
+  .srow.on { background:color-mix(in srgb, var(--signal) 9%, transparent); }
+  .srow .sl { font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); }
+  .srow .strack { height:14px; position:relative; }
+  .srow .sbar { position:absolute; inset:0 auto 0 0; border-radius:0 4px 4px 0; min-width:3px; }
+  .srow .sn { font-family:var(--mono); font-size:12px; text-align:right; font-variant-numeric:tabular-nums; }
+
+  /* ---------- aging / waiting list ---------- */
+  .waits { border-top:1px solid var(--line-2); }
+  .wait { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:14px; padding:10px 2px; border-bottom:1px solid var(--line); align-items:baseline; }
+  .wait .co { font-weight:600; font-size:13.5px; }
+  .wait .role { color:var(--ink-2); font-size:12px; }
+  .wait .score { font-family:var(--mono); font-size:11.5px; color:var(--ink-2); white-space:nowrap; }
+  .agebadge { font-family:var(--mono); font-size:10.5px; padding:2.5px 9px; border-radius:2px; white-space:nowrap; }
 
   /* needs-you cards */
   .needs { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
@@ -124,15 +183,23 @@
   nav.tabs button { background:none; border:0; padding:10px 14px 9px; cursor:pointer; color:var(--ink-3);
                     font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; }
   nav.tabs button.on { color:var(--ink); box-shadow:inset 0 -2px 0 var(--signal); }
-  .toolbar { display:flex; gap:10px; align-items:center; padding:14px 0; }
-  #q { padding:9px 13px; width:min(360px,100%); border:1px solid var(--line-2); border-radius:3px;
+  .toolbar { display:flex; gap:10px; align-items:center; padding:14px 0; flex-wrap:wrap; }
+  #q { padding:9px 13px; width:min(300px,100%); border:1px solid var(--line-2); border-radius:3px;
        background:var(--card); color:var(--ink); font-size:13.5px; }
   #q:focus { outline:2px solid var(--signal); outline-offset:1px; }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; }
+  .chip { font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase;
+          border:1px solid var(--line-2); background:var(--card); color:var(--ink-2);
+          border-radius:99px; padding:5px 12px; cursor:pointer; }
+  .chip:hover { border-color:var(--signal); color:var(--signal-ink); }
+  .chip.on { background:var(--signal); border-color:var(--signal); color:#fff; }
   .pane { overflow-x:auto; background:var(--card); border:1px solid var(--line-2); border-radius:3px; }
   table { border-collapse:collapse; width:100%; font-size:13px; }
   th { position:sticky; top:0; background:var(--card); text-align:left; color:var(--ink-3); font-family:var(--mono);
        font-weight:500; font-size:10px; text-transform:uppercase; letter-spacing:.12em; padding:11px 13px;
-       border-bottom:1px solid var(--line-2); white-space:nowrap; }
+       border-bottom:1px solid var(--line-2); white-space:nowrap; cursor:pointer; user-select:none; }
+  th:hover { color:var(--signal-ink); }
+  th .dir { color:var(--signal); }
   td { padding:11px 13px; border-bottom:1px solid var(--line); vertical-align:top; }
   tr:last-child td { border-bottom:0; }
   tbody tr:hover td { background:color-mix(in srgb, var(--signal) 3%, transparent); }
@@ -149,6 +216,11 @@
   .notes.open { -webkit-line-clamp:unset; }
   .empty { padding:30px; color:var(--ink-3); text-align:center; font-size:13.5px; }
   footer { color:var(--ink-3); font-family:var(--mono); font-size:10.5px; letter-spacing:.05em; padding:26px 2px 0; }
+
+  /* tooltip */
+  #tip { position:fixed; z-index:50; pointer-events:none; background:var(--ink); color:var(--paper);
+         font-family:var(--mono); font-size:11px; padding:6px 10px; border-radius:3px; white-space:nowrap;
+         transform:translate(-50%,calc(-100% - 10px)); display:none; box-shadow:0 8px 24px -8px rgba(0,0,0,.4); }
 
   /* reveal choreography */
   .rise { opacity:0; transform:translateY(10px); animation:rise .55s cubic-bezier(.2,.7,.2,1) forwards; }
@@ -186,37 +258,64 @@
         <div class="sub" id="herosub"></div>
         <div class="meter">
           <div class="bar"><div class="fill" id="meterfill" style="width:0%"></div></div>
-          <div class="cap"><span>4 Jul · campaign start</span><span id="meterright"></span></div>
+          <div class="cap"><span id="meterleft"></span><span id="meterright"></span></div>
         </div>
       </div>
       <div class="herostats" id="herostats"></div>
     </div>
 
-    <section class="rise" style="animation-delay:.08s">
+    <section class="rise" style="animation-delay:.06s">
+      <div class="seclabel"><h3>The funnel</h3><span class="rule"></span><span class="hint">tap a stage to see its rows</span></div>
+      <div class="funnel" id="funnel"></div>
+      <div class="fnote" id="funnelnote"></div>
+    </section>
+
+    <section class="rise" style="animation-delay:.12s">
+      <div class="seclabel"><h3>Daily cadence</h3><span class="rule"></span><span class="hint">submissions per day · target 15</span></div>
+      <div class="cadwrap"><div class="cadence" id="cadence"></div><div class="cadaxis" id="cadaxis"></div></div>
+      <div class="cadsum" id="cadsum"></div>
+    </section>
+
+    <section class="rise" style="animation-delay:.18s">
+      <div class="seclabel"><h3>Where they stand</h3><span class="rule"></span><span class="hint">tap to filter</span></div>
+      <div class="statusrows" id="statusrows"></div>
+    </section>
+
+    <section class="rise" style="animation-delay:.24s">
       <div class="seclabel"><h3>Needs you</h3><span class="count" id="needcount"></span><span class="rule"></span></div>
       <div id="needs"></div>
     </section>
 
-    <section class="rise" style="animation-delay:.16s">
+    <section class="rise" style="animation-delay:.3s">
+      <div class="seclabel"><h3>Waiting on a reply</h3><span class="count" id="waitcount"></span><span class="rule"></span></div>
+      <div class="waits" id="waits"></div>
+    </section>
+
+    <section class="rise" style="animation-delay:.36s">
       <div class="seclabel"><h3>Latest movement</h3><span class="rule"></span></div>
       <div class="moves" id="moves"></div>
     </section>
 
-    <section class="rise" style="animation-delay:.24s">
+    <section class="rise" id="record" style="animation-delay:.42s">
       <div class="seclabel"><h3>The record</h3><span class="rule"></span></div>
       <nav class="tabs" id="tabs"></nav>
-      <div class="toolbar"><input id="q" placeholder="Filter this table…"></div>
+      <div class="toolbar">
+        <input id="q" placeholder="Filter this table…">
+        <div class="chips" id="chips"></div>
+      </div>
       <div class="pane"><div id="pane"></div></div>
       <footer>updates after every run · encrypted at rest on github pages · decrypted only in this browser</footer>
     </section>
   </div>
 </div>
 
+<div id="tip" role="status"></div>
+
 <script>
 // All dynamic content rendered via DOM methods (textContent) - data can never execute as markup.
 const $ = s => document.querySelector(s);
 const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
-let DOC = null, TAB = "Pipeline", QUERY = "";
+let DOC = null, TAB = "Pipeline", QUERY = "", GROUP = "all", SORT = { col:-1, dir:-1 };
 
 const el = (tag, cls, text) => {
   const n = document.createElement(tag);
@@ -238,11 +337,11 @@ const parseLink = v => {
 const kindOf = s => {
   s = (s || "").toUpperCase();
   if (s.startsWith("INTERVIEW") || s.startsWith("OFFER") || s === "DONE" || s.startsWith("PAID")) return "good";
-  if (s.startsWith("REPLY") || s.startsWith("SCREEN")) return "good";
+  if (s.startsWith("REPLY") || s.startsWith("SCREEN") || s.startsWith("THANKED") || s.startsWith("ACCEPTED")) return "good";
   if (s.startsWith("APPLIED") || s.startsWith("SENT") || s.startsWith("ACTIVE")) return "neutral";
   if (s.startsWith("PENDING") || s.startsWith("WATCH") || s.startsWith("QUEUED") || s.startsWith("READY") || s.startsWith("OPTIONAL")) return "warn";
   if (s.startsWith("BLOCKED") || s.startsWith("BOUNCED") || s.startsWith("OVERDUE")) return "serious";
-  if (s.startsWith("REJECTED") || s.startsWith("GHOSTED")) return "crit";
+  if (s.startsWith("REJECTED") || s.startsWith("GHOSTED") || s.startsWith("EXPIRED")) return "crit";
   return "neutral";
 };
 const pillNode = s => {
@@ -254,6 +353,49 @@ const pillNode = s => {
   return p;
 };
 
+/* ---------- shared tooltip ---------- */
+const tip = { node:null,
+  show(target, text) {
+    if (!this.node) this.node = $("#tip");
+    const r = target.getBoundingClientRect();
+    this.node.textContent = text;
+    this.node.style.left = (r.left + r.width / 2) + "px";
+    this.node.style.top = r.top + "px";
+    this.node.style.display = "block";
+  },
+  hide() { if (this.node) this.node.style.display = "none"; }
+};
+const hoverTip = (node, text) => {
+  node.addEventListener("pointerenter", () => tip.show(node, text));
+  node.addEventListener("pointerleave", () => tip.hide());
+  node.addEventListener("focus", () => tip.show(node, text));
+  node.addEventListener("blur", () => tip.hide());
+  node.setAttribute("aria-label", text);
+};
+
+/* ---------- status grouping (mirrors the export script's is_status) ---------- */
+const STATUS = 8;
+const stOf = r => String(r[STATUS] || "").toUpperCase();
+const isSubmitted = r => { const s = stOf(r); if (s.startsWith("GHOSTED-LISTING")) return false;
+  return ["APPLIED","REPLY","SCREEN","INTERVIEW","OFFER","REJECTED","GHOSTED"].some(p => s.startsWith(p)); };
+const isLive = r => { const s = stOf(r); if (s.startsWith("GHOSTED-LISTING")) return false;
+  return ["APPLIED","REPLY","SCREEN","INTERVIEW"].some(p => s.startsWith(p)); };
+const GROUPS = {
+  all:       { label:"All",        test:() => true },
+  live:      { label:"Live",       test:isLive },
+  replies:   { label:"Replies",    test:r => ["REJECTED","REPLY","SCREEN","INTERVIEW","OFFER"].some(p => stOf(r).startsWith(p)) },
+  rejected:  { label:"Rejected",   test:r => stOf(r).startsWith("REJECTED") },
+  blocked:   { label:"Blocked",    test:r => stOf(r).startsWith("BLOCKED") },
+  ready:     { label:"Ready/Queued", test:r => stOf(r).startsWith("READY") || stOf(r).startsWith("QUEUED") },
+  parked:    { label:"Parked",     test:r => ["NEAR-MISS","OUT OF SCOPE","WATCHLIST","GHOSTED-LISTING"].some(p => stOf(r).startsWith(p)) },
+  interviews:{ label:"Interviews", test:r => ["INTERVIEW","OFFER"].some(p => stOf(r).startsWith(p)) },
+};
+const appDate = r => {
+  const m = String(r[9] || "").match(/\d{4}-\d{2}-\d{2}/);
+  return m ? m[0] : (String(r[1] || "").match(/\d{4}-\d{2}-\d{2}/) || [null])[0];
+};
+const fmtDay = iso => new Date(iso + "T12:00:00").toLocaleDateString("en-GB", { weekday:"short", day:"numeric", month:"short" });
+
 /* ---------- hero ---------- */
 function renderHero() {
   const k = DOC.kpis, g = DOC.goal;
@@ -261,53 +403,204 @@ function renderHero() {
   h.replaceChildren();
   if (k.interviews > 0) {
     h.appendChild(document.createTextNode("Interviews booked: "));
-    h.appendChild(Object.assign(el("b", null, String(k.interviews))));
+    h.appendChild(el("b", null, String(k.interviews)));
     $("#herosub").textContent = "The diary has what we came for. Keep the pipeline warm and prep well.";
   } else if (g.daysLeft >= 0) {
-    h.appendChild(Object.assign(el("b", null, g.daysLeft + " days")));
+    h.appendChild(el("b", null, g.daysLeft + (g.daysLeft === 1 ? " day" : " days")));
     h.appendChild(document.createTextNode(" to land the first interview"));
-    $("#herosub").textContent = `Deadline ${g.deadline}. The machine applies, connects and chases daily; phone calls and the actions below are yours.`;
+    $("#herosub").textContent = `Deadline ${g.deadline}. The machine applies, connects and chases every run; the actions above and phone dispatches are yours.`;
   } else {
     h.appendChild(document.createTextNode("Deadline passed. Regroup and keep going."));
     $("#herosub").textContent = "The retro will propose the next strategy shift.";
   }
-  const span = 17, elapsed = Math.min(span, Math.max(0, span - g.daysLeft));
+  const start = g.start || "2026-07-04";
+  const span = Math.max(1, (new Date(g.deadline) - new Date(start)) / 864e5);
+  const elapsed = Math.min(span, Math.max(0, span - g.daysLeft));
   $("#meterfill").style.width = Math.round(100 * elapsed / span) + "%";
+  $("#meterleft").textContent = fmtDay(start) + " · start";
   $("#meterright").textContent = g.deadline + " · deadline";
 
+  const week = (DOC.applications || []).filter(r => { const d = appDate(r);
+    return isSubmitted(r) && d && (Date.now() - new Date(d + "T12:00:00")) / 864e5 < 7; }).length;
   const hs = $("#herostats");
   hs.replaceChildren();
-  const stat = (n, l) => { const d = el("div"); d.appendChild(el("div", "n", String(n))); d.appendChild(el("div", "l", l)); hs.appendChild(d); };
-  stat(k.submitted, "applied");
+  const stat = (n, l, sub) => { const d = el("div"); const nn = el("div", "n", String(n));
+    if (sub) nn.appendChild(el("small", null, sub)); d.appendChild(nn); d.appendChild(el("div", "l", l)); hs.appendChild(d); };
+  stat(k.submitted, "applied", "+" + week + " wk");
   stat(k.livePipeline, "live");
   stat(k.interviews, "interviews");
-  stat(k.connects, "connects");
-  stat(k.agencyEmails, "agencies");
+  stat(k.replies ?? k.rejected ?? 0, "replies");
+  stat(k.actionsPending ?? 0, "need you");
   stat("£" + Number(k.receivedNet || 0).toLocaleString("en-GB"), "earned");
 }
 
 /* ---------- needs you ---------- */
+let SHOW_OPTIONAL = false;
 function renderNeeds() {
   const box = $("#needs");
   box.replaceChildren();
-  const pending = (DOC.actions || []).filter(a => (a[5] || "").startsWith("PENDING") || (a[5] || "") === "OPTIONAL");
+  const acts = DOC.actions || [];
+  const pending = acts.filter(a => (a[5] || "").startsWith("PENDING"));
+  const optional = acts.filter(a => (a[5] || "").startsWith("OPTIONAL"));
   $("#needcount").textContent = pending.length ? String(pending.length) : "";
-  if (!pending.length) {
+  if (!pending.length && !optional.length) {
     box.appendChild(el("div", "allclear", "✓ Nothing waiting on you. The machine has it."));
     return;
   }
-  const grid = el("div", "needs");
-  pending.forEach(a => {
-    const card = el("div", "need");
-    card.appendChild(el("div", "what", a[2]));
+  const card = a => {
+    const c = el("div", "need");
+    c.appendChild(el("div", "what", a[2]));
     const meta = el("div", "meta");
-    meta.appendChild(el("span", "blocks", (a[5] === "OPTIONAL" ? "optional · " : "") + (a[4] || "")));
+    meta.appendChild(el("span", "blocks", ((a[5] || "").startsWith("OPTIONAL") ? "optional · " : "") + (a[4] || "")));
     const l = parseLink(a[3]);
     if (l) meta.appendChild(link(l.href, "Open ↗", "go"));
-    card.appendChild(meta);
-    grid.appendChild(card);
-  });
+    c.appendChild(meta);
+    return c;
+  };
+  const grid = el("div", "needs");
+  pending.forEach(a => grid.appendChild(card(a)));
+  if (SHOW_OPTIONAL) optional.forEach(a => grid.appendChild(card(a)));
   box.appendChild(grid);
+  if (optional.length) {
+    const t = el("button", "chip" + (SHOW_OPTIONAL ? " on" : ""),
+      SHOW_OPTIONAL ? "hide optional" : "+ " + optional.length + " optional");
+    t.style.marginTop = "12px";
+    t.onclick = () => { SHOW_OPTIONAL = !SHOW_OPTIONAL; renderNeeds(); };
+    box.appendChild(t);
+  }
+}
+
+/* ---------- funnel ---------- */
+function jumpToGroup(gk) {
+  TAB = "Pipeline"; GROUP = gk; QUERY = ""; $("#q").value = "";
+  renderTabs(); renderChips(); renderPane(); renderFunnel(); renderStatus();
+  $("#tabs").scrollIntoView({ block:"start" });
+}
+function renderFunnel() {
+  const apps = DOC.applications || [];
+  const stages = [
+    ["Submitted", apps.filter(isSubmitted).length, "all"],
+    ["Replies",   apps.filter(GROUPS.replies.test).length, "replies"],
+    ["Screens",   apps.filter(r => ["SCREEN","INTERVIEW","OFFER"].some(p => stOf(r).startsWith(p))).length, "interviews"],
+    ["Interviews", DOC.kpis.interviews, "interviews"],
+    ["Offers",    apps.filter(r => stOf(r).startsWith("OFFER")).length, "interviews"],
+  ];
+  const max = Math.max(1, stages[0][1]);
+  const box = $("#funnel");
+  box.replaceChildren();
+  stages.forEach(([name, n, gk], i) => {
+    const b = el("button", "fstage" + (TAB === "Pipeline" && GROUP === gk && i < 2 ? " on" : ""));
+    b.appendChild(el("span", "fl", name));
+    const track = el("span", "ftrack");
+    const bar = el("span", "fbar" + (n === 0 ? " zero" : ""));
+    bar.style.width = Math.max(1.2, 100 * n / max) + "%";
+    track.appendChild(bar);
+    b.appendChild(track);
+    const fn = el("span", "fn", String(n));
+    const prev = i === 0 ? null : stages[i - 1][1];
+    if (i > 0) fn.appendChild(el("span", "pct", prev ? Math.round(100 * n / prev) + "% of prev" : "—"));
+    b.appendChild(fn);
+    hoverTip(b, `${name}: ${n}` + (i > 0 && prev ? ` · ${Math.round(100 * n / prev)}% of ${stages[i-1][0]}` : ""));
+    b.onclick = () => jumpToGroup(gk);
+    box.appendChild(b);
+  });
+  const rej = DOC.kpis.rejected ?? 0;
+  $("#funnelnote").textContent = rej ? `of the ${stages[1][1]} replies so far, ${rej} were rejections at the CV screen — the wall the outreach channels exist to route around` : "";
+}
+
+/* ---------- daily cadence ---------- */
+function renderCadence() {
+  const apps = (DOC.applications || []).filter(isSubmitted);
+  const start = DOC.goal.start || "2026-07-04";
+  const days = [];
+  for (let d = new Date(start + "T12:00:00"); d <= new Date(); d.setDate(d.getDate() + 1))
+    days.push(d.toISOString().slice(0, 10));
+  const counts = Object.fromEntries(days.map(d => [d, 0]));
+  apps.forEach(r => { const d = appDate(r); if (d && d in counts) counts[d]++; });
+  const max = Math.max(3, ...Object.values(counts));
+  const box = $("#cadence"), axis = $("#cadaxis");
+  box.replaceChildren(); axis.replaceChildren();
+  days.forEach(d => {
+    const n = counts[d];
+    const day = el("button", "cday" + (n === 0 ? " zero" : ""));
+    const bar = el("span", "cbar");
+    bar.style.height = n === 0 ? "2px" : Math.max(6, Math.round(100 * n / max)) + "%";
+    day.appendChild(bar);
+    hoverTip(day, `${fmtDay(d)} — ${n} submitted`);
+    box.appendChild(day);
+    const lab = el("span", null, new Date(d + "T12:00:00").getDay() === 1 ? d.slice(8) + "/" + d.slice(5, 7) : "");
+    axis.appendChild(lab);
+  });
+  const last7 = days.slice(-7).reduce((s, d) => s + counts[d], 0);
+  const prev7 = days.slice(-14, -7).reduce((s, d) => s + counts[d], 0);
+  const sum = $("#cadsum");
+  sum.replaceChildren();
+  const item = (label, val) => { const s = el("span"); s.appendChild(document.createTextNode(label + " "));
+    s.appendChild(el("b", null, val)); sum.appendChild(s); };
+  item("last 7 days", String(last7));
+  item("previous 7", String(prev7));
+  item("best day", String(Math.max(...Object.values(counts))));
+  item("days at zero", String(Object.values(counts).filter(n => n === 0).length) + " of " + days.length);
+}
+
+/* ---------- status breakdown ---------- */
+function renderStatus() {
+  const apps = DOC.applications || [];
+  const rows = [
+    ["Live",        apps.filter(isLive).length,               "var(--good)",        "live"],
+    ["Rejected",    apps.filter(GROUPS.rejected.test).length, "var(--crit-ink)",    "rejected"],
+    ["Blocked",     apps.filter(GROUPS.blocked.test).length,  "var(--signal)",      "blocked"],
+    ["Ready/queued",apps.filter(GROUPS.ready.test).length,    "var(--warn-ink)",    "ready"],
+    ["Parked",      apps.filter(GROUPS.parked.test).length,   "var(--neutral-ink)", "parked"],
+  ];
+  const max = Math.max(1, ...rows.map(r => r[1]));
+  const box = $("#statusrows");
+  box.replaceChildren();
+  rows.forEach(([name, n, color, gk]) => {
+    const b = el("button", "srow" + (TAB === "Pipeline" && GROUP === gk ? " on" : ""));
+    b.appendChild(el("span", "sl", name));
+    const track = el("span", "strack");
+    const bar = el("span", "sbar");
+    bar.style.width = Math.max(1.5, 100 * n / max) + "%";
+    bar.style.background = n === 0 ? "var(--line-2)" : color;
+    track.appendChild(bar);
+    b.appendChild(track);
+    b.appendChild(el("span", "sn", String(n)));
+    hoverTip(b, `${name}: ${n} — tap to filter the table`);
+    b.onclick = () => jumpToGroup(gk);
+    box.appendChild(b);
+  });
+}
+
+/* ---------- waiting on a reply (aging) ---------- */
+function renderWaits() {
+  const today = Date.now();
+  const live = (DOC.applications || []).filter(isLive)
+    .map(r => ({ r, d: appDate(r) }))
+    .map(x => ({ ...x, age: x.d ? Math.floor((today - new Date(x.d + "T12:00:00")) / 864e5) : null }))
+    .sort((a, b) => (b.age ?? -1) - (a.age ?? -1));
+  const box = $("#waits");
+  box.replaceChildren();
+  $("#waitcount").textContent = live.length ? String(live.length) : "";
+  if (!live.length) { box.appendChild(el("div", "empty", "Nothing live right now.")); return; }
+  live.slice(0, 10).forEach(({ r, age }) => {
+    const w = el("div", "wait");
+    const c = el("div");
+    c.appendChild(el("span", "co", r[2]));
+    c.appendChild(el("div", "role", r[3]));
+    w.appendChild(c);
+    w.appendChild(el("span", "score", r[7] ? r[7] + "/10" : ""));
+    const kind = age === null ? "neutral" : age >= 10 ? "serious" : age >= 5 ? "warn" : "neutral";
+    const badge = el("span", "agebadge", age === null ? "—" : age + "d out");
+    badge.style.background = `var(--${kind}-soft)`;
+    badge.style.color = `var(--${kind}-ink)`;
+    w.appendChild(badge);
+    box.appendChild(w);
+  });
+  if (live.length > 10) {
+    const more = el("div", "empty", "+" + (live.length - 10) + " more — tap Live above");
+    box.appendChild(more);
+  }
 }
 
 /* ---------- movement ---------- */
@@ -334,11 +627,32 @@ const GENERIC = {
   Freelance: { key:"freelance", cols:["Date","Platform","Type","Item","Amount","Status","Link"], status:5, links:[6] },
   Income:    { key:"income", cols:["Date","Source","Client","Description","Invoiced","Fees","Received","On","Status","Notes"], status:8, links:[] },
 };
+const PIPE_COLS = ["When","Company / Role","Score","Salary","Where","Status","Follow-up","Files","Notes"];
+const PIPE_SORT = { 0:r => appDate(r) || String(r[1]), 1:r => String(r[2]).toLowerCase(), 2:r => Number(r[7]) || 0, 5:r => stOf(r) };
+
+function sortableHead(cols, sortable) {
+  const thead = el("thead"), tr = el("tr");
+  cols.forEach((c, i) => {
+    const th = el("th", null, c);
+    if (sortable[i] !== undefined) {
+      if (SORT.col === i) th.appendChild(el("span", "dir", SORT.dir > 0 ? " ↑" : " ↓"));
+      th.onclick = () => { SORT = SORT.col === i ? { col:i, dir:-SORT.dir } : { col:i, dir:1 }; renderPane(); };
+    } else th.style.cursor = "default";
+    tr.appendChild(th);
+  });
+  thead.appendChild(tr);
+  return thead;
+}
+function applySort(rows, sortable) {
+  if (SORT.col < 0 || sortable[SORT.col] === undefined) return rows;
+  const key = sortable[SORT.col];
+  return [...rows].sort((a, b) => { const x = key(a), y = key(b);
+    return (x < y ? -1 : x > y ? 1 : 0) * SORT.dir; });
+}
 
 function pipelineTable(rows) {
-  const table = el("table"), thead = el("thead"), tr = el("tr");
-  ["When","Company / Role","Score","Salary","Where","Status","Follow-up","Files","Notes"].forEach(c => tr.appendChild(el("th", null, c)));
-  thead.appendChild(tr); table.appendChild(thead);
+  const table = el("table");
+  table.appendChild(sortableHead(PIPE_COLS, PIPE_SORT));
   const tbody = el("tbody");
   rows.forEach(r => {
     const t = el("tr");
@@ -369,9 +683,10 @@ function pipelineTable(rows) {
 }
 
 function genericTable(spec, rows) {
-  const table = el("table"), thead = el("thead"), tr = el("tr");
-  spec.cols.forEach(c => tr.appendChild(el("th", null, c)));
-  thead.appendChild(tr); table.appendChild(thead);
+  const sortable = Object.fromEntries(spec.cols.map((_, i) => [i, r => String(r[i] ?? "").toLowerCase()]));
+  const table = el("table");
+  table.appendChild(sortableHead(spec.cols, sortable));
+  rows = applySort(rows, sortable);
   const tbody = el("tbody");
   rows.forEach(r => {
     const t = el("tr");
@@ -398,8 +713,20 @@ function renderTabs() {
   nav.replaceChildren();
   names.forEach(n => {
     const b = el("button", n === TAB ? "on" : "", n);
-    b.onclick = () => { TAB = n; renderTabs(); renderPane(); };
+    b.onclick = () => { TAB = n; SORT = { col:-1, dir:-1 }; renderTabs(); renderChips(); renderPane(); };
     nav.appendChild(b);
+  });
+}
+
+function renderChips() {
+  const box = $("#chips");
+  box.replaceChildren();
+  if (TAB !== "Pipeline") return;
+  Object.entries(GROUPS).forEach(([gk, g]) => {
+    if (gk === "interviews") return;
+    const c = el("button", "chip" + (GROUP === gk ? " on" : ""), g.label);
+    c.onclick = () => { GROUP = gk; renderChips(); renderPane(); renderFunnel(); renderStatus(); };
+    box.appendChild(c);
   });
 }
 
@@ -408,9 +735,10 @@ function renderPane() {
   pane.replaceChildren();
   let rows, node;
   if (TAB === "Pipeline") {
-    rows = DOC.applications || [];
+    rows = (DOC.applications || []).filter(GROUPS[GROUP].test);
     if (QUERY) rows = rows.filter(r => r.join(" ").toLowerCase().includes(QUERY));
-    node = rows.length ? pipelineTable(rows) : el("div", "empty", "No applications yet.");
+    rows = applySort(rows, PIPE_SORT);
+    node = rows.length ? pipelineTable(rows) : el("div", "empty", GROUP === "all" && !QUERY ? "No applications yet." : "Nothing in this view yet — it will fill as the funnel moves.");
   } else {
     const spec = GENERIC[TAB];
     rows = DOC[spec.key] || [];
@@ -422,7 +750,8 @@ function renderPane() {
 
 function renderAll() {
   $("#generated").textContent = "updated " + DOC.generated;
-  renderHero(); renderNeeds(); renderMoves(); renderTabs(); renderPane();
+  renderHero(); renderNeeds(); renderFunnel(); renderCadence(); renderStatus();
+  renderWaits(); renderMoves(); renderTabs(); renderChips(); renderPane();
 }
 
 /* ---------- crypto + load ---------- */
@@ -443,16 +772,24 @@ async function load(pass) {
   $("#app").style.display = "block";
   renderAll();
 }
-$("#unlock").onclick = () => load($("#pass").value).catch(e => {
-  $("#err").textContent = e.name === "OperationError" ? "That passphrase doesn't decrypt it." : e.message;
-});
-$("#pass").addEventListener("keydown", e => { if (e.key === "Enter") $("#unlock").click(); });
-$("#refresh").onclick = () => load(localStorage.getItem("kt-pass"));
-$("#lockbtn").onclick = () => { localStorage.removeItem("kt-pass"); location.reload(); };
+if (window.__DATA__) {           // snapshot mode: data injected locally, no lock, no animations
+  DOC = window.__DATA__;
+  document.body.classList.add("snap");
+  $("#lock").style.display = "none";
+  $("#app").style.display = "block";
+  renderAll();
+} else {
+  $("#unlock").onclick = () => load($("#pass").value).catch(e => {
+    $("#err").textContent = e.name === "OperationError" ? "That passphrase doesn't decrypt it." : e.message;
+  });
+  $("#pass").addEventListener("keydown", e => { if (e.key === "Enter") $("#unlock").click(); });
+  $("#refresh").onclick = () => load(localStorage.getItem("kt-pass"));
+  $("#lockbtn").onclick = () => { localStorage.removeItem("kt-pass"); location.reload(); };
+  setInterval(() => { if (DOC && localStorage.getItem("kt-pass")) $("#refresh").click(); }, 300000);
+  const saved = localStorage.getItem("kt-pass");
+  if (saved) load(saved).catch(() => localStorage.removeItem("kt-pass"));
+}
 $("#q").addEventListener("input", e => { QUERY = e.target.value.toLowerCase(); renderPane(); });
-setInterval(() => { if (DOC && localStorage.getItem("kt-pass")) $("#refresh").click(); }, 300000);
-const saved = localStorage.getItem("kt-pass");
-if (saved) load(saved).catch(() => localStorage.removeItem("kt-pass"));
 </script>
 </body>
 </html>
